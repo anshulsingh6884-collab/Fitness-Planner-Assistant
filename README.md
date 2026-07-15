@@ -1,68 +1,97 @@
-# Strive AI — Fitness Planner (Desktop App)
+# Strive AI - Fitness Planner
 
-Python desktop app (CustomTkinter) jo tumhare profile se **AI-based workout +
-diet plan** generate karta hai, aur ek **offline AI assistant** bhi deta hai
-fitness questions ke liye. Koi internet/API key nahi chahiye — sab kuch
-formula/rule-based engine se locally chalta hai.
+A desktop fitness planner app built with Python. You fill in some basic info about yourself (age, weight, height, goal, activity level) and it works out a daily calorie target, a weekly workout split, and a diet plan for you. There's also a small offline assistant tab you can ask fitness-related questions to.
 
-## Features
-- **Profile tab** — age, weight, height, goal, activity level, diet
-  preference, workout days/week
-- **Dashboard** — BMI, BMR, TDEE, daily calorie target, protein/carb/fat
-  macros (Mifflin-St Jeor formula use hota hai)
-- **Workout Plan** — poore hafte ka split (Full Body / Upper-Lower / Push-Pull-Legs)
-  tumhare workout days ke hisaab se automatically choose hota hai
-- **Diet Plan** — Veg / Non-Veg / Vegan meal suggestions with calorie split
-- **AI Assistant** — chat-style tab jo protein, calories, sleep, motivation,
-  plateau jaise questions ka jawab deta hai (tumhare hi targets use karke)
-- Data automatically save hota hai (`~/.fitness_ai_planner/data.json`) —
-  app dobara kholo toh plan wapas load ho jayega
+I built this as a personal project to combine a bit of nutrition science (Mifflin-St Jeor formula for BMR/TDEE) with a simple rule-based recommendation system, wrapped in a clean desktop UI using CustomTkinter.
 
-## Project Structure
+![Python](https://img.shields.io/badge/python-3.9+-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+
+## What it does
+
+- **Profile setup** - enter your age, weight, height, gender, activity level, goal (lose weight / maintain / gain muscle), diet preference, and how many days a week you want to train.
+- **Dashboard** - shows your BMI, BMR, TDEE, daily calorie target, and a protein/carbs/fat breakdown.
+- **Workout plan** - automatically builds a weekly split (Full Body, Upper/Lower, or Push/Pull/Legs depending on how many days you picked) with sets and reps for each exercise.
+- **Diet plan** - suggests meals for breakfast, lunch, dinner and snacks based on your diet preference (veg / non-veg / vegan), with an approximate calorie split per meal.
+- **AI Assistant** - a simple chat tab that answers common questions (protein intake, hydration, sleep, motivation, plateaus, etc.) using your own numbers from the Dashboard.
+- Everything is saved locally to a JSON file, so your plan is still there next time you open the app.
+
+## Why "AI" if there's no API call?
+
+There's no external LLM being called here - I didn't want the app to depend on an API key or an internet connection to work. Instead it's a rule/formula based engine: BMR and TDEE come from the Mifflin-St Jeor equation, and the workout/diet logic picks from a set of exercise and food templates based on your goal and preferences.
+
+If you want to hook it up to a real LLM (OpenAI, Anthropic, etc.) for more varied/natural plans and conversation, the two places to change are `generate_workout_plan()` / `generate_diet_plan()` in `app/planner.py`, and `get_response()` in `app/assistant.py`. Everything else (the UI, the storage) stays the same.
+
+## Screenshots
+
+**Dashboard** - BMI, BMR, TDEE, calorie target and macro breakdown at a glance.
+
+![Dashboard](screenshots/dashboard.png)
+
+**Workout plan** - a weekly split generated based on your goal and how many days you picked.
+
+![Workout plan](screenshots/workout-plan.png)
+
+**Diet plan** - meal suggestions with an approximate calorie split per meal.
+
+![Diet plan](screenshots/diet-plan.png)
+
+**AI Assistant** - ask it about protein, calories, sleep, motivation, and more.
+
+![AI Assistant](screenshots/assistant.png)
+
+## Tech stack
+
+- Python 3.9+
+- [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter) for the UI
+- Plain JSON for local storage (no database needed)
+
+## Getting started
+
+Clone the repo and install the one dependency:
+
+```bash
+git clone https://github.com/<your-username>/strive-ai-fitness-planner.git
+cd strive-ai-fitness-planner
+pip install -r requirements.txt
+```
+
+Then run it:
+
+```bash
+python main.py
+```
+
+Fill in the Profile tab and hit **Generate My AI Plan**. That's it.
+
+## Project structure
+
 ```
 fitness_ai_planner/
-├── main.py                 # Entry point — python main.py
+├── main.py                # entry point
 ├── requirements.txt
 └── app/
-    ├── gui.py               # CustomTkinter UI (sidebar + all screens)
-    ├── planner.py           # BMI/BMR/TDEE calc + workout/diet generation
-    ├── assistant.py         # Rule-based offline AI assistant
-    ├── data.py              # Exercise & food database
-    └── storage.py           # Save/load local JSON data
+    ├── gui.py              # CustomTkinter UI - sidebar + all screens
+    ├── planner.py          # BMI/BMR/TDEE math + workout/diet generation
+    ├── assistant.py        # rule-based offline assistant
+    ├── data.py             # exercise & food database
+    └── storage.py          # saves/loads your plan to ~/.fitness_ai_planner/data.json
 ```
 
-## Run karne ke liye
+## Roadmap / ideas
 
-1. Dependencies install karo:
-   ```
-   pip install -r requirements.txt
-   ```
+Things I might add later, or feel free to open a PR:
 
-2. App run karo:
-   ```
-   python main.py
-   ```
+- [ ] Weight log over time with a progress chart
+- [ ] Multiple saved profiles
+- [ ] Export your plan as a PDF
+- [ ] Water/workout reminders
+- [ ] Optional LLM integration for smarter, more varied plans
 
-3. **Profile** tab me apni details bharo → **"Generate My AI Plan"** dabao →
-   Dashboard, Workout Plan, Diet Plan automatically ban jayenge.
+## Contributing
 
-## Ise "asli AI" jaisa smart kaise banaye (optional upgrade)
+Open an issue or a PR if you spot a bug or want to add something. Nothing formal here, just keep it reasonably clean.
 
-Abhi ye ek **rule-based recommendation engine** hai (fast, offline, free).
-Agar tum isko real LLM (OpenAI/Anthropic/Gemini) se connect karna chaho taaki
-plans aur zyada varied/smart bane:
+## License
 
-1. `app/planner.py` me `generate_workout_plan()` aur `generate_diet_plan()`
-   ke andar, exercise database use karne ke bajaye ek API call kar sakte ho
-   (user ka profile JSON banake prompt me bhejo, response parse karo).
-2. `app/assistant.py` ke `get_response()` ko bhi isi tarah API call se
-   replace kar sakte ho for more natural conversation.
-3. API key ke liye `.env` file ya Settings tab add karna hoga.
-
-Bata dena agar ye upgrade bhi chahiye — main wo bhi bana dunga.
-
-## Next steps (agar chaho)
-- Progress tracking (weight log over time, chart)
-- Multiple saved profiles / login
-- Export plan as PDF
-- Reminders/notifications for water & workouts
+MIT - do whatever you want with it.
